@@ -3,6 +3,9 @@ package com.silentbutler.controller;
 import com.silentbutler.dto.CreateRoomRequest;
 import com.silentbutler.dto.RoomResponse;
 import com.silentbutler.service.RoomService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,7 @@ public class RoomController {
     }
 
     @PostMapping
-    public ResponseEntity<RoomResponse> createRoom(@RequestBody CreateRoomRequest request) {
+    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody CreateRoomRequest request) {
         return ResponseEntity.ok(roomService.createRoom(request));
     }
 

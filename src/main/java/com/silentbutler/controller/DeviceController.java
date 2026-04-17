@@ -3,6 +3,9 @@ package com.silentbutler.controller;
 import com.silentbutler.dto.CreateDeviceRequest;
 import com.silentbutler.dto.DeviceResponse;
 import com.silentbutler.service.DeviceService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,7 @@ public class DeviceController {
     }
 
     @PostMapping
-    public ResponseEntity<DeviceResponse> createDevice(@RequestBody CreateDeviceRequest request) {
+    public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviceRequest request) {
         return ResponseEntity.ok(deviceService.createDevice(request));
     }
 

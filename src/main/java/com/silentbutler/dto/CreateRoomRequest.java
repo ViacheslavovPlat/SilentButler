@@ -1,9 +1,18 @@
 package com.silentbutler.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CreateRoomRequest {
+    @NotBlank(message = "Room name must not be blank")
     private String name;
-    private Long userId; // which user this room belongs to
+
+    @NotNull(message = "User ID must not be null")
+    private Long userId;
 }
