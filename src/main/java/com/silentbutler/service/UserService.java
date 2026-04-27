@@ -7,6 +7,7 @@ import com.silentbutler.dto.UserResponse;
 import com.silentbutler.exception.ResourceAlreadyExistsException;
 import com.silentbutler.exception.ResourceNotFoundException;
 import com.silentbutler.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +17,12 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse createUser(CreateUserRequest request){
@@ -33,12 +37,21 @@ public class UserService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
         userRepository.save(user);
 
         return mapToUserResponse(user);
+    }
+
+    public UserResponse getUserByUsername(String username){
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if(user.isPresent()){
+            return mapToUserResponse(user.get());
+        }else
+            throw new ResourceNotFoundException("User not found with usenrame: " + username);
     }
 
     public UserResponse getUserById(Long id){

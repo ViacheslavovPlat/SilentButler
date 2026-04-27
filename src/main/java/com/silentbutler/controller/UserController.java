@@ -7,6 +7,7 @@ import com.silentbutler.dto.UserResponse;
 import com.silentbutler.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -32,6 +33,12 @@ public class UserController {
     @GetMapping
     public List<UserResponse> getAllUsers(){
         return userService.getAllUsers();
+    }
+
+    @GetMapping("/me")
+    public UserResponse getUserByUsername(Authentication authentication){
+        String username = authentication.getName();
+        return userService.getUserByUsername(username);
     }
 
     @DeleteMapping("/{id}")
