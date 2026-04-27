@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "rooms")
+@Table(name = "scenarios")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Room {
+public class Scenario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,9 +28,16 @@ public class Room {
 
     private String description;
 
+    @Column(nullable = false)
+    private boolean active;
+
     private LocalDateTime createdAt;
 
     @Builder.Default
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Device> devices = new ArrayList<>();
+    @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScenarioCondition> conditions = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScenarioAction> actions = new ArrayList<>();
 }

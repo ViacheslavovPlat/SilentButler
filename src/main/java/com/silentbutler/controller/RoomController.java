@@ -3,9 +3,7 @@ package com.silentbutler.controller;
 import com.silentbutler.dto.CreateRoomRequest;
 import com.silentbutler.dto.RoomResponse;
 import com.silentbutler.service.RoomService;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,9 +29,9 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getRoomById(id));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<RoomResponse>> getRoomsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(roomService.getRoomsByUser(userId));
+    @GetMapping("/house/{houseId}")
+    public ResponseEntity<List<RoomResponse>> getRoomsByHouse(@PathVariable Long houseId) {
+        return ResponseEntity.ok(roomService.getRoomsByHouse(houseId));
     }
 
     @DeleteMapping("/{id}")

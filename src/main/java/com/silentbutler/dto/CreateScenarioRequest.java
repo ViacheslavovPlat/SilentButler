@@ -9,12 +9,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateRoomRequest {
-    @NotBlank(message = "Room name must not be blank")
+public class CreateScenarioRequest {
+    @NotBlank(message = "Scenario name must not be blank")
     private String name;
 
     private String description;
 
     @NotNull(message = "House ID must not be null")
     private Long houseId;
+
+    private boolean active;
 }

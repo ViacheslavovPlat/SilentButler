@@ -7,9 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoomResponse {
+public class HouseResponse {
     private Long id;
     private String name;
-    private String description;
-    private Long houseId;
+    private String address;
+    private Long userId;
 }

@@ -3,9 +3,7 @@ package com.silentbutler.controller;
 import com.silentbutler.dto.CreateDeviceRequest;
 import com.silentbutler.dto.DeviceResponse;
 import com.silentbutler.service.DeviceService;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,14 +34,14 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.getDevicesByRoom(roomId));
     }
 
+    @PatchMapping("/{id}/toggle")
+    public ResponseEntity<DeviceResponse> toggleDevice(@PathVariable Long id) {
+        return ResponseEntity.ok(deviceService.toggleDevice(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
         deviceService.deleteDevice(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{id}/toggle")
-    public ResponseEntity<DeviceResponse> toggleDevice(@PathVariable Long id) {
-        return ResponseEntity.ok(deviceService.toggleDevice(id));
     }
 }

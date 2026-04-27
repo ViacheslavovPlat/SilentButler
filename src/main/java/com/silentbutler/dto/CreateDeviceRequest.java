@@ -13,11 +13,12 @@ public class CreateDeviceRequest {
     @NotBlank(message = "Device name must not be blank")
     private String name;
 
-    @NotBlank(message = "Device type must not be blank")
-    private String type;
+    @NotNull(message = "Category ID must not be null")
+    private Long categoryId;
 
     @NotNull(message = "Room ID must not be null")
     private Long roomId;
 
     private boolean status;
+    private boolean active;
 }

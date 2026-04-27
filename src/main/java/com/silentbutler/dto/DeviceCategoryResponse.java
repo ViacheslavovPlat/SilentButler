@@ -7,9 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoomResponse {
+public class DeviceCategoryResponse {
     private Long id;
     private String name;
+    private String icon;
     private String description;
-    private Long houseId;
 }

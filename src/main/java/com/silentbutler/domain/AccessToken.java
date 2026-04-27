@@ -6,35 +6,30 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "devices")
+@Table(name = "access_tokens")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Device {
+public class AccessToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private DeviceCategory category;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
-    private String name;
+    private String tokenHash;
 
     @Column(nullable = false)
-    private boolean status; // on/off
+    private String type; // e.g. "BEARER"
 
-    @Column(nullable = false)
-    private boolean active;
+    private LocalDateTime expiresAt;
 
     private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime revokedAt;
 }
