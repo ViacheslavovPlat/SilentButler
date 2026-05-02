@@ -24,14 +24,14 @@ public class HouseController {
         return ResponseEntity.ok(houseService.createHouse(request));
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<HouseResponse>> getMyHouses() {
+        return ResponseEntity.ok(houseService.getMyHouses());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<HouseResponse> getHouseById(@PathVariable Long id) {
         return ResponseEntity.ok(houseService.getHouseById(id));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<HouseResponse>> getHousesByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(houseService.getHousesByUser(userId));
     }
 
     @DeleteMapping("/{id}")

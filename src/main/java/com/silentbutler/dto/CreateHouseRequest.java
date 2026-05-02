@@ -1,7 +1,6 @@
 package com.silentbutler.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -10,12 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CreateHouseRequest {
+
     @NotBlank(message = "House name must not be blank")
     private String name;
 
     @NotBlank(message = "House address must not be blank")
     private String address;
 
-    @NotNull(message = "User ID must not be null")
-    private Long userId;
+    // userId removed — the owner is resolved from the JWT token, not supplied by the client
 }

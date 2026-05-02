@@ -7,6 +7,8 @@ import com.silentbutler.dto.HouseResponse;
 import com.silentbutler.exception.ResourceNotFoundException;
 import com.silentbutler.repository.HouseRepository;
 import com.silentbutler.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,30 +26,28 @@ public class HouseService {
     }
 
     public HouseResponse createHouse(CreateHouseRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User owner = resolveCurrentUser();
 
         House house = House.builder()
                 .name(request.getName())
                 .address(request.getAddress())
-                .user(user)
+                .user(owner)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        houseRepository.save(house);
-        return mapToResponse(house);
+        return mapToResponse(houseRepository.save(house));
     }
 
     public HouseResponse getHouseById(Long id) {
         House house = houseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("House not found"));
+        assertOwnership(house);
         return mapToResponse(house);
     }
 
-    public List<HouseResponse> getHousesByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return houseRepository.findByUser(user)
+    public List<HouseResponse> getMyHouses() {
+        User owner = resolveCurrentUser();
+        return houseRepository.findByUser(owner)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -56,7 +56,23 @@ public class HouseService {
     public void deleteHouse(Long id) {
         House house = houseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("House not found"));
+        assertOwnership(house);
         houseRepository.delete(house);
+    }
+
+    //  Helpers 
+
+    private User resolveCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private void assertOwnership(House house) {
+        User currentUser = resolveCurrentUser();
+        if (!house.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You do not have access to this house");
+        }
     }
 
     private HouseResponse mapToResponse(House house) {

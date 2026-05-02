@@ -4,6 +4,7 @@ import com.silentbutler.domain.Role;
 import com.silentbutler.domain.User;
 import com.silentbutler.dto.CreateUserRequest;
 import com.silentbutler.dto.UpdateUserRequest;
+import com.silentbutler.dto.UpdateMeRequest;
 import com.silentbutler.dto.UserResponse;
 import com.silentbutler.exception.ResourceAlreadyExistsException;
 import com.silentbutler.exception.ResourceNotFoundException;
@@ -33,7 +34,6 @@ public class UserService {
             throw new ResourceAlreadyExistsException("Email already exists");
         }
 
-        // find the Role object by name
         Role role = roleRepository.findByName(request.getRole())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRole()));
 
@@ -56,6 +56,13 @@ public class UserService {
         return mapToUserResponse(user);
     }
 
+    // Used by /me — resolves the caller from the JWT username
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return mapToUserResponse(user);
+    }
+
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -69,6 +76,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    // Used by PUT /{id} — can update username, email and role
     public UserResponse updateUser(Long id, UpdateUserRequest userRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -82,7 +90,6 @@ public class UserService {
             throw new ResourceAlreadyExistsException("Email already exists");
         }
 
-        // find the Role object by name
         Role role = roleRepository.findByName(userRequest.getRole())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + userRequest.getRole()));
 
@@ -90,8 +97,28 @@ public class UserService {
         user.setEmail(userRequest.getEmail());
         user.setRole(role);
 
-        User updatedUser = userRepository.save(user);
-        return mapToUserResponse(updatedUser);
+        return mapToUserResponse(userRepository.save(user));
+    }
+
+    // Used by PUT /me — can only update username and email, not role
+    public UserResponse updateUserByUsername(String username, UpdateMeRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!user.getUsername().equals(request.getUsername())
+                && userRepository.existsByUsername(request.getUsername())) {
+            throw new ResourceAlreadyExistsException("Username already taken");
+        }
+        if (!user.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Email already exists");
+        }
+
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        // intentionally not touching role — users can't promote themselves
+
+        return mapToUserResponse(userRepository.save(user));
     }
 
     private UserResponse mapToUserResponse(User user) {
@@ -99,7 +126,7 @@ public class UserService {
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .role(user.getRole().getName()) // return role name as string in response
+                .role(user.getRole().getName())
                 .build();
     }
 }
