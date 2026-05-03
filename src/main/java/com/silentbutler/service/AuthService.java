@@ -92,6 +92,13 @@ public class AuthService {
                 .build();
     }
 
+    public void logout(String token) {
+        AccessToken accessToken = accessTokenRepository.findByTokenHash(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+        accessToken.setRevokedAt(LocalDateTime.now());
+        accessTokenRepository.save(accessToken);
+    }
+
     private void storeToken(User user, String token) {
         AccessToken accessToken = AccessToken.builder()
                 .user(user)

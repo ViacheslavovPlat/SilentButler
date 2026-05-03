@@ -1,6 +1,8 @@
 package com.silentbutler.security;
 
+import com.silentbutler.domain.AccessToken;
 import com.silentbutler.domain.User;
+import com.silentbutler.repository.AccessTokenRepository;
 import com.silentbutler.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,10 +23,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
     private final UserRepository userRepository;
+    private final AccessTokenRepository accessTokenRepository;
 
-    public JwtAuthFilter(JWTService jwtService, UserRepository userRepository) {
+    public JwtAuthFilter(JWTService jwtService, UserRepository userRepository, AccessTokenRepository accessTokenRepository) {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.accessTokenRepository = accessTokenRepository;
     }
 
     @Override
@@ -41,7 +45,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
+        // 1. Check JWT signature and expiry
         if (!jwtService.isTokenValid(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+ 
+        // 2. Check the token hasn't been revoked (e.g. user logged out)
+        AccessToken storedToken = accessTokenRepository.findByTokenHash(token).orElse(null);
+        if (storedToken == null || storedToken.getRevokedAt() != null) {
             filterChain.doFilter(request, response);
             return;
         }
