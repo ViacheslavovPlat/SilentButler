@@ -15,4 +15,7 @@ public class CreateRoomRequest {
 
     @NotNull(message = "User ID must not be null")
     private Long userId;
+
+    @NotBlank(message = "username must not be blank")
+    private String username;
 }

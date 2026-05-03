@@ -7,6 +7,7 @@ import com.silentbutler.service.RoomService;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,18 +18,26 @@ public class RoomController {
 
     private final RoomService roomService;
 
-    public RoomController(RoomService roomService) {
+    public RoomController(RoomService roomService)
+    {
         this.roomService = roomService;
     }
 
     @PostMapping
-    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody CreateRoomRequest request) {
-        return ResponseEntity.ok(roomService.createRoom(request));
+    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody CreateRoomRequest request,
+                                                   Authentication authentication) {
+        return ResponseEntity.ok(roomService.createRoomForCurrentUser(request,authentication.getName()));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<RoomResponse>> getMyRooms(Authentication authentication){
+        return ResponseEntity.ok(roomService.getRoomsForCurrentUser(authentication.getName()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long id) {
-        return ResponseEntity.ok(roomService.getRoomById(id));
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long id,
+                                                    Authentication authentication) {
+        return ResponseEntity.ok(roomService.getRoomByIdForCurrentUser(id, authentication.getName()));
     }
 
     @GetMapping("/user/{userId}")
@@ -37,8 +46,9 @@ public class RoomController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
-        roomService.deleteRoom(id);
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long id,
+                                           Authentication authentication) {
+        roomService.deleteRoomForCurrentUser(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

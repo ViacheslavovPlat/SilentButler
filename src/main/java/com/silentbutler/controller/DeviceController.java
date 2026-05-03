@@ -3,12 +3,11 @@ package com.silentbutler.controller;
 import com.silentbutler.dto.CreateDeviceRequest;
 import com.silentbutler.dto.DeviceResponse;
 import com.silentbutler.service.DeviceService;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.Authentication;
 import java.util.List;
 
 @RestController
@@ -22,28 +21,33 @@ public class DeviceController {
     }
 
     @PostMapping
-    public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviceRequest request) {
-        return ResponseEntity.ok(deviceService.createDevice(request));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<DeviceResponse> getDeviceById(@PathVariable Long id) {
-        return ResponseEntity.ok(deviceService.getDeviceById(id));
+    public ResponseEntity<DeviceResponse> createDevice(@Valid @RequestBody CreateDeviceRequest request,
+                                                       Authentication authentication) {
+        return ResponseEntity.ok(deviceService.createDeviceForCurrentUser(request, authentication.getName()));
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<DeviceResponse>> getDevicesByRoom(@PathVariable Long roomId) {
-        return ResponseEntity.ok(deviceService.getDevicesByRoom(roomId));
+    public ResponseEntity<List<DeviceResponse>> getDevicesByRoom(@PathVariable Long roomId,
+                                                                 Authentication authentication) {
+        return ResponseEntity.ok(deviceService.getDevicesByRoomForCurrentUser(roomId, authentication.getName()));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
-        deviceService.deleteDevice(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<DeviceResponse> getDeviceById(@PathVariable Long id,
+                                                        Authentication authentication) {
+        return ResponseEntity.ok(deviceService.getDeviceByIdForCurrentUser(id, authentication.getName()));
     }
 
     @PatchMapping("/{id}/toggle")
-    public ResponseEntity<DeviceResponse> toggleDevice(@PathVariable Long id) {
-        return ResponseEntity.ok(deviceService.toggleDevice(id));
+    public ResponseEntity<DeviceResponse> toggleDevice(@PathVariable Long id,
+                                                       Authentication authentication) {
+        return ResponseEntity.ok(deviceService.toggleDeviceForCurrentUser(id, authentication.getName()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDevice(@PathVariable Long id,
+                                             Authentication authentication) {
+        deviceService.deleteDeviceForCurrentUser(id, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 }
