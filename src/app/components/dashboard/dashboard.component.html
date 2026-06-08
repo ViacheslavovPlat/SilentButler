@@ -1,0 +1,45 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border" role="status"></div>
+    <p class="mt-2">Loading...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger mt-4">{{ error }}</div>
+
+  <div *ngIf="!loading && user" class="row mt-4">
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <h4>👤 {{ user.username }}</h4>
+        <p class="text-muted">{{ user.email }}</p>
+        <span class="badge bg-secondary">{{ user.role }}</span>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <h2 class="text-primary">{{ rooms.length }}</h2>
+        <p class="text-muted">Rooms</p>
+        <a routerLink="/rooms" class="btn btn-outline-primary btn-sm">Manage Rooms</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        <h2 class="text-success">{{ deviceCount }}</h2>
+        <p class="text-muted">Devices</p>
+        <a routerLink="/rooms" class="btn btn-outline-success btn-sm">View Devices</a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && rooms.length > 0" class="mt-4">
+    <h5>Your Rooms</h5>
+    <div class="row">
+      <div class="col-md-3" *ngFor="let room of rooms">
+        <div class="card p-3 mb-3">
+          <h6>{{ room.name }}</h6>
+          <a [routerLink]="['/devices', room.id]" class="btn btn-sm btn-outline-dark">Devices</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

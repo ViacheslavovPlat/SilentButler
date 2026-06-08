@@ -1,0 +1,42 @@
+package com.silentbutler.controller;
+
+import com.silentbutler.dto.CreateRoomRequest;
+import com.silentbutler.dto.RoomResponse;
+import com.silentbutler.service.RoomService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/rooms")
+public class RoomController {
+
+    private final RoomService roomService;
+
+    public RoomController(RoomService roomService) {
+        this.roomService = roomService;
+    }
+
+    @PostMapping
+    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody CreateRoomRequest request) {
+        return ResponseEntity.ok(roomService.createRoom(request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long id) {
+        return ResponseEntity.ok(roomService.getRoomById(id));
+    }
+
+    @GetMapping("/house/{houseId}")
+    public ResponseEntity<List<RoomResponse>> getRoomsByHouse(@PathVariable Long houseId) {
+        return ResponseEntity.ok(roomService.getRoomsByHouse(houseId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+        roomService.deleteRoom(id);
+        return ResponseEntity.noContent().build();
+    }
+}
