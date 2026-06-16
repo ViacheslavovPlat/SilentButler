@@ -53,7 +53,7 @@ public class DeviceService {
                 .name(request.getName())
                 .room(room)
                 .category(category)
-                .status(request.isStatus())
+                .status(request.getStatus())
                 .active(request.isActive())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -79,7 +79,7 @@ public class DeviceService {
                 .toList();
     }
 
-    public DeviceResponse toggleDevice(Long id) {
+    public DeviceResponse toggleDevice(Long id, float newState) {
         Device device = deviceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Device not found"));
 
@@ -90,18 +90,17 @@ public class DeviceService {
             throw new AccessDeniedException("You do not have access to this device");
         }
 
-        String oldState = device.isStatus() ? "ON" : "OFF";
-        device.setStatus(!device.isStatus());
+        float oldState = device.getStatus();
+        device.setStatus(newState);
         device.setUpdatedAt(LocalDateTime.now());
         deviceRepository.save(device);
-        String newState = device.isStatus() ? "ON" : "OFF";
-
+        
         Event event = Event.builder()
                 .device(device)
                 .user(currentUser)
                 .eventType("TOGGLE")
-                .oldState(oldState)
-                .newState(newState)
+                .oldState(String.valueOf(oldState))
+                .newState(String.valueOf(newState))
                 .timestamp(LocalDateTime.now())
                 .build();
         eventRepository.save(event);
@@ -137,7 +136,7 @@ public class DeviceService {
                 .name(device.getName())
                 .categoryName(device.getCategory().getName())
                 .roomId(device.getRoom().getId())
-                .status(device.isStatus())
+                .status(device.getStatus())
                 .active(device.isActive())
                 .build();
     }
